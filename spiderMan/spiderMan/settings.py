@@ -12,12 +12,12 @@ BOT_NAME = 'spiderMan'
 SPIDER_MODULES = ['spiderMan.spiders']
 NEWSPIDER_MODULE = 'spiderMan.spiders'
 
-
+FEED_EXPORT_ENCODING = 'utf-8'
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'spiderMan (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -37,10 +37,14 @@ ROBOTSTXT_OBEY = True
 #TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
-#DEFAULT_REQUEST_HEADERS = {
-#   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-#   'Accept-Language': 'en',
-#}
+# DEFAULT_REQUEST_HEADERS = {
+   # 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+   # 'Accept-Encoding': 'gzip, deflate, br',
+   # 'Accept-Language': 'zh-CN,zh;q=0.9',
+   # 'Cache-Control': 'max-age=0',
+   # 'Connection': 'keep-alive',
+   # 'Host': 'www.wmzy.com',
+# }
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
@@ -62,15 +66,15 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'spiderMan.pipelines.SpidermanPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'spiderMan.pipelines.SpidermanPipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
 #AUTOTHROTTLE_ENABLED = True
 # The initial download delay
-#AUTOTHROTTLE_START_DELAY = 5
+AUTOTHROTTLE_START_DELAY = 5
 # The maximum download delay to be set in case of high latencies
 #AUTOTHROTTLE_MAX_DELAY = 60
 # The average number of requests Scrapy should be sending in parallel to
