@@ -3,6 +3,9 @@ import scrapy
 from scrapy.http import Request
 from spiderMan.items import SpiderManItem
 from spiderMan.items import DetailInfoItem
+from spiderMan.items import CelebrityInfoItem
+from spiderMan.items import DisciplineEvaluationItem
+from spiderMan.items import LibEvaluationItem
 import sys
 import json
 import re
@@ -104,11 +107,16 @@ class WmzySchInfoSpider(scrapy.Spider):
         result = re.findall(".*<script id=\"__NEXT_DATA__\" type=\"application/json\">(.*?)<\/script>.*", response_body)
 
         detail_info_item = DetailInfoItem()
+        celebrity_info_item = CelebrityInfoItem()
+        discipline_evaluation_item = DisciplineEvaluationItem()
+        lib_evaluation_item = LibEvaluationItem()
 
         for x in result:
             data = json.loads(x)
             sch_detail_info = data['props']['pageProps']['schoolInfor']['sch_detail_info']
+            # 师资信息
             sch_faculty_info = data['props']['pageProps']['schoolInfor']['sch_faculty_info']['sch_faculty_intro']
+
             sch_id = sch_detail_info['sch_id']
             sch_intro = sch_detail_info['sch_intro']
             sch_address = sch_detail_info['sch_address']
@@ -135,3 +143,40 @@ class WmzySchInfoSpider(scrapy.Spider):
             detail_info_item['stu_dorm_desc'] = stu_dorm_desc
             detail_info_item['t'] = 'sch_detail_info'
             yield detail_info_item
+
+            # 知名校友
+            sch_celebrity_info = data['props']['pageProps']['schoolInfor']['sch_celebrity_info']
+            if len(sch_celebrity_info) > 0:
+                for celebrity_info in sch_celebrity_info:
+                    celebrity_info_item['sch_id'] = sch_id
+                    celebrity_info_item['celebrity_name'] = celebrity_info['celebrity_name']
+                    celebrity_info_item['celebrity_desc'] = celebrity_info['celebrity_desc']
+                    celebrity_info_item['t'] = 'sch_celebrity_info'
+                    yield celebrity_info_item
+
+            # 重点学科
+            discipline_evaluation_list = data['props']['pageProps']['schoolInfor']['sch_discipline_evaluation_list']['sch_discipline_evaluation_list']
+            if len(discipline_evaluation_list) > 0:
+                for discipline_evaluation in discipline_evaluation_list:
+                    discipline_evaluation_item['sch_id'] = sch_id
+                    discipline_evaluation_item['obj_id'] = discipline_evaluation['obj_id']
+                    discipline_evaluation_item['obj_name'] = discipline_evaluation['obj_name']
+                    discipline_evaluation_item['obj_num'] = discipline_evaluation['obj_num']
+                    discipline_evaluation_item['obj_list'] = discipline_evaluation['obj_list']
+                    discipline_evaluation_item['t'] = 'discipline_evaluation'
+                    yield discipline_evaluation_item
+
+            # 特色培养
+            sch_lib_evaluation_list = data['props']['pageProps']['schoolInfor']['sch_lib_evaluation_list']['sch_lib_evaluation_list']
+            if len(sch_lib_evaluation_list) > 0:
+                for lib_evaluation in sch_lib_evaluation_list:
+                    lib_evaluation_item['sch_id'] = sch_id
+                    lib_evaluation_item['obj_id'] = lib_evaluation['obj_id']
+                    lib_evaluation_item['obj_name'] = lib_evaluation['obj_name']
+                    lib_evaluation_item['obj_num'] = lib_evaluation['obj_num']
+                    lib_evaluation_item['obj_list'] = lib_evaluation['obj_list']
+                    lib_evaluation_item['t'] = 'lib_evaluation'
+                    yield lib_evaluation_item
+
+
+

@@ -37,6 +37,12 @@ class SpidermanPipeline:
             self.operate_sch_info(item)
         elif item['t'] == 'sch_detail_info':
             self.operate_sch_detail_info(item)
+        elif item['t'] == 'sch_celebrity_info':
+            self.operate_celebrity_info(item)
+        elif item['t'] == 'discipline_evaluation':
+            self.operate_discipline_evaluation_info(item)
+        elif item['t'] == 'lib_evaluation':
+            self.operate_lib_evaluation_info(item)
         return item
 
     def operate_sch_info(self, item):
@@ -84,6 +90,58 @@ class SpidermanPipeline:
                   (sch_faculty_intro,sch_id,sch_intro,sch_address,sch_tel_num,sch_female_ratio,sch_master_ratio,sch_abroad_ratio,sch_scholarship,sch_fellowship,canteen_desc,stu_dorm_desc)
                   VALUES 
                   (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                """
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+    # 知名校友
+    def operate_celebrity_info(self, item):
+        values = (
+            item['sch_id'],
+            item['celebrity_name'],
+            item['celebrity_desc'],
+        )
+        sql = """
+                  INSERT IGNORE INTO zyp_sch_celebrity_info
+                  (sch_id,celebrity_name,celebrity_desc)
+                  VALUES 
+                  (%s,%s,%s)
+                """
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+    # 重点学科
+    def operate_discipline_evaluation_info(self, item):
+        values = (
+            item['sch_id'],
+            item['obj_id'],
+            item['obj_name'],
+            item['obj_num'],
+            item['obj_list'],
+        )
+        sql = """
+                  INSERT IGNORE INTO zyp_sch_discipline_evaluation_info
+                  (sch_id,obj_id,obj_name,obj_num,obj_list)
+                  VALUES 
+                  (%s,%s,%s)
+                """
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+    # 特色培养
+    def operate_lib_evaluation_info(self, item):
+        values = (
+            item['sch_id'],
+            item['obj_id'],
+            item['obj_name'],
+            item['obj_num'],
+            item['obj_list'],
+        )
+        sql = """
+                  INSERT IGNORE INTO zyp_sch_lib_evaluation_info
+                  (sch_id,obj_id,obj_name,obj_num,obj_list)
+                  VALUES 
+                  (%s,%s,%s)
                 """
         self.cursor.execute(sql, values)
         self.conn.commit()
