@@ -118,8 +118,8 @@ class WmzyMajorInfoSpider(scrapy.Spider):
                                     "diploma": _meta['diploma'],
                                     "stu_province_id": province
                                 }
-                                yield scrapy.Request(major_enroll_unit_url, meta=meta, callback=self.parse_major_enroll_info,
-                                                     method='POST', headers=self.headers, body=json.dumps(form_data))
+                    yield scrapy.Request(major_enroll_unit_url, meta=meta, callback=self.parse_major_enroll_info,
+                                         method='POST', headers=self.headers, body=json.dumps(form_data))
 
     def parse_detail_page(self, response):
         json_content = json.loads(response.body)

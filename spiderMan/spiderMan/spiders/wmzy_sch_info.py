@@ -6,6 +6,8 @@ from spiderMan.items import DetailInfoItem
 from spiderMan.items import CelebrityInfoItem
 from spiderMan.items import DisciplineEvaluationItem
 from spiderMan.items import LibEvaluationItem
+from spiderMan.items import EnrollUnitListItem
+from spiderMan.items import EnrollRuleInfoItem
 import sys
 import json
 import re
@@ -18,26 +20,15 @@ class WmzySchInfoSpider(scrapy.Spider):
     name = 'wmzy_sch_info'
     allowed_domains = ['wmzy.com']
     start_url = 'https://www.wmzy.com/gw/api/sku/sku_service/sch_complete'
+    # ======录取招生页请求url start======
+    get_enroll_unit_list_url = "https://www.wmzy.com/gw/api/sku/enroll_admission_service/get_enroll_unit_list"
+    get_sch_enroll_rule_info_url = "https://www.wmzy.com/gw/sys/get_sch_enroll_rule_info"
+    # ======录取招生页请求url end  ======
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36',
         'Channel': 'www.wmzy.com pc',
         'Content-Type': 'application/json; charset=utf-8'
-    }
-
-    type_desc = {
-        "综合": 1,
-        "工科": 2,
-        "农业": 3,
-        "林业": 4,
-        "医药": 5,
-        "师范": 6,
-        "语言": 7,
-        "财经": 8,
-        "政法": 9,
-        "体育": 10,
-        "艺术": 11,
-        "民族": 12,
     }
 
     # 默认情况下，scrapy都是采用GET请求。重写的目的：初始URL的请求修改用POST请求。
@@ -71,7 +62,6 @@ class WmzySchInfoSpider(scrapy.Spider):
             sch_logo = data['sch_logo']
             sch_name = data['sch_name']
             sch_run_type = data['sch_run_type']
-            # sch_run_type_desc = data['sch_run_type_desc']
             sch_type_desc = data['sch_type_desc']
             sch_type_tag_desc = data['sch_type_tag_desc']
 
@@ -96,7 +86,30 @@ class WmzySchInfoSpider(scrapy.Spider):
 
             # 构造详情页的请求
             detail_url = "https://www.wmzy.com/web/school?sch_id=" + sch_id
-            yield scrapy.Request(detail_url, callback=self.parse_detail_page)
+            #yield scrapy.Request(detail_url, callback=self.parse_detail_page)
+
+            # =========构造录取招生页的请求 start=================
+            # enroll_unit
+            post_enroll_unit_list_data = {
+                "province_id": "130000000000",
+                "enroll_category": 1,
+                "enroll_mode": 1,
+                "sch_id": sch_id
+            }
+            enroll_unit_list_meta = {
+                "stu_province_id": "130000000000",
+                "sch_id": sch_id,
+            }
+            #yield scrapy.Request(self.get_enroll_unit_list_url, meta=enroll_unit_list_meta, callback=self.parse_enroll_unit_list_data,
+            #                     method='POST', headers=self.headers, body=json.dumps(post_enroll_unit_list_data))
+
+            # enroll_rule
+            post_sch_enroll_rule_info_data = {
+                "sch_id": sch_id
+            }
+            yield scrapy.Request(self.get_sch_enroll_rule_info_url, callback=self.parse_sch_enroll_rule_info_data,
+                                 method='POST', headers=self.headers, body=json.dumps(post_sch_enroll_rule_info_data))
+            # =========构造录取招生页的请求 end  =================
 
     def parse_detail_page(self, response):
         """
@@ -189,5 +202,33 @@ class WmzySchInfoSpider(scrapy.Spider):
             except (IndexError, BaseException):
                 print('不存在特色培养')
 
+            # enroll_unit
 
+    # enroll_unit_list
+    def parse_enroll_unit_list_data(self, response):
+        _meta = response.meta
+        enroll_unit_item = EnrollUnitListItem()
+        json_content = json.loads(response.body)
+        if json_content['code'] == 0 and len(json_content['data']['enroll_unit_info']) > 0:
+            for enroll_unit_info in json_content['data']['enroll_unit_info']:
+                enroll_unit_item['enroll_unit_code'] = enroll_unit_info['enroll_unit_code']
+                enroll_unit_item['enroll_unit_id'] = enroll_unit_info['enroll_unit_id']
+                enroll_unit_item['enroll_unit_name'] = enroll_unit_info['enroll_unit_name']
+                enroll_unit_item['stu_province_id'] = _meta['stu_province_id']
+                enroll_unit_item['sch_id'] = _meta['sch_id']
+                enroll_unit_item['t'] = 'enroll_unit_list'
+                yield enroll_unit_item
+
+    # enroll_rule_info
+    def parse_sch_enroll_rule_info_data(self, response):
+        enroll_rule_info_item = EnrollRuleInfoItem()
+        json_content = json.loads(response.body)
+        if json_content['code'] == 0:
+            sch_enroll_rule_info = json_content['data']['sch_enroll_rule_info']
+            enroll_rule_info_item['sch_id'] = sch_enroll_rule_info['sch_id']
+            enroll_rule_info_item['academic_year'] = sch_enroll_rule_info['academic_year']
+            enroll_rule_info_item['enroll_rule_title'] = sch_enroll_rule_info['enroll_rule_title']
+            enroll_rule_info_item['content'] = sch_enroll_rule_info['content']
+            enroll_rule_info_item['t'] = 'sch_enroll_rule_info'
+            yield enroll_rule_info_item
 

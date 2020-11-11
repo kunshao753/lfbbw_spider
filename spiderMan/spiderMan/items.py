@@ -220,3 +220,23 @@ class emDetailItem(scrapy.Item):
     sch_id = Field()
     wenli = Field()
     t = Field()
+
+
+# enroll unit
+class EnrollUnitListItem(scrapy.Item):
+    enroll_unit_code = Field()
+    enroll_unit_id = Field()
+    enroll_unit_name = Field()
+    stu_province_id = Field()
+    sch_id = Field()
+    t = Field()
+
+
+# enroll rule
+class EnrollRuleInfoItem(scrapy.Item):
+    sch_id = Field()
+    academic_year = Field()
+    enroll_rule_title = Field()
+    content = Field()
+    t = Field()
+

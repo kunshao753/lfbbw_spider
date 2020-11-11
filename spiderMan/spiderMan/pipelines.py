@@ -59,6 +59,10 @@ class SpidermanPipeline:
             self.operate_em_adm_data(item)
         elif item['t'] == 'em_detail':
             self.operate_em_detail(item)
+        elif item['t'] == 'enroll_unit_list':
+            self.operate_enroll_unit_list(item)
+        elif item['t'] == 'sch_enroll_rule_info':
+            self.operate_sch_enroll_rule_info(item)
         return item
 
     def operate_sch_info(self, item):
@@ -386,6 +390,41 @@ class SpidermanPipeline:
                   (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
                    %s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                 """
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+    # unit list
+    def operate_enroll_unit_list(self, item):
+        values = (
+            item['enroll_unit_code'],
+            item['enroll_unit_id'],
+            item['enroll_unit_name'],
+            item['stu_province_id'],
+            item['sch_id'],
+        )
+        sql = """
+                 INSERT IGNORE INTO zyp_enroll_unit
+                 (enroll_unit_code,enroll_unit_id,enroll_unit_name,stu_province_id,sch_id)
+                 VALUES 
+                 (%s,%s,%s,%s,%s)
+               """
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+    # sch_enroll_rule_info
+    def operate_sch_enroll_rule_info(self, item):
+        values = (
+            item['sch_id'],
+            item['academic_year'],
+            item['enroll_rule_title'],
+            item['content'],
+        )
+        sql = """
+                 INSERT IGNORE INTO zyp_sch_rule_info
+                 (sch_id,academic_year,enroll_rule_title,content)
+                 VALUES 
+                 (%s,%s,%s,%s)
+               """
         self.cursor.execute(sql, values)
         self.conn.commit()
 
