@@ -43,6 +43,22 @@ class SpidermanPipeline:
             self.operate_discipline_evaluation_info(item)
         elif item['t'] == 'lib_evaluation':
             self.operate_lib_evaluation_info(item)
+        elif item['t'] == 'major':
+            self.operate_major_info(item)
+        elif item['t'] == 'major_detail':
+            self.operate_major_detail_info(item)
+        elif item['t'] == 'career':
+            self.operate_career_info(item)
+        elif item['t'] == 'major_enroll':
+            self.operate_major_enroll_info(item)
+        elif item['t'] == 'enroll_major_select':
+            self.operate_enroll_major_select(item)
+        elif item['t'] == 'em_enroll_data':
+            self.operate_em_enroll_data(item)
+        elif item['t'] == 'em_adm_data':
+            self.operate_em_adm_data(item)
+        elif item['t'] == 'em_detail':
+            self.operate_em_detail(item)
         return item
 
     def operate_sch_info(self, item):
@@ -123,7 +139,7 @@ class SpidermanPipeline:
                   INSERT IGNORE INTO zyp_sch_discipline_evaluation_info
                   (sch_id,obj_id,obj_name,obj_num,obj_list)
                   VALUES 
-                  (%s,%s,%s)
+                  (%s,%s,%s,%s,%s)
                 """
         self.cursor.execute(sql, values)
         self.conn.commit()
@@ -141,7 +157,234 @@ class SpidermanPipeline:
                   INSERT IGNORE INTO zyp_sch_lib_evaluation_info
                   (sch_id,obj_id,obj_name,obj_num,obj_list)
                   VALUES 
+                  (%s,%s,%s,%s,%s)
+                """
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+    # 专业信息
+    def operate_major_info(self, item):
+        values = (
+            item['sid'],
+            item['sname'],
+            item['cid'],
+            item['cname'],
+            item['mid'],
+            item['mname'],
+            item['diploma'],
+        )
+        sql = """
+                  INSERT IGNORE INTO zyp_major_info
+                  (sid,sname,cid,cname,mid,mname,diploma)
+                  VALUES 
+                  (%s,%s,%s,%s,%s,%s,%s)
+                """
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+    # 专业详细信息
+    def operate_major_detail_info(self, item):
+        values = (
+            item['mid'],
+            item['intro'],
+            item['academic_rule'],
+            item['degree'],
+            item['training_objective'],
+            item['training_requirement'],
+            item['employment_info'],
+            item['main_course'],
+            item['knowledge_requirement'],
+            item['teaching_practice'],
+        )
+        sql = """
+                  INSERT IGNORE INTO zyp_major_detail_info
+                  (mid,intro,academic_rule,degree,training_objective,training_requirement,employment_info,
+                  main_course,knowledge_requirement,teaching_practice)
+                  VALUES 
+                  (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                """
+
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+    # 事业信息
+    def operate_career_info(self, item):
+        values = (
+            item['career_id'],
+            item['name'],
+            item['desc'],
+        )
+        sql = """
+                  INSERT IGNORE INTO zyp_careers_info
+                  (career_id,name,`desc`)
+                  VALUES 
                   (%s,%s,%s)
+                """
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+    # 注册专业信息
+    def operate_major_enroll_info(self, item):
+        values = (
+            item['mid'],
+            item['wenli'],
+            item['sch_id'],
+            item['province_id'],
+            item['city_id'],
+            item['city_id_desc'],
+            item['eu_code'],
+            item['stu_province_id'],
+
+            item['diploma_desc'],
+            item['diploma_id'],
+            item['enroll_group_no'],
+            item['eu_id'],
+            item['eu_name'],
+            item['has_grad_sch'],
+            item['independent_college'],
+            item['major_diploma_id'],
+            item['province_id_desc'],
+            item['required_course_desc'],
+            item['required_course_num'],
+        )
+        sql = """
+                  INSERT IGNORE INTO zyp_major_enroll_info
+                  (mid,wenli,sch_id,province_id,city_id,city_id_desc,eu_code,stu_province_id,
+                  diploma_desc,diploma_id,enroll_group_no,eu_id,eu_name,has_grad_sch,independent_college,major_diploma_id,
+                  province_id_desc,required_course_desc,required_course_num)
+                  VALUES 
+                  (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                   %s,%s,%s,%s,%s,%s,%s,%s,%s)
+                """
+        print("----------")
+        print(sql)
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+    #
+    def operate_enroll_major_select(self, item):
+        values = (
+            item['batch'],
+            item['batch_ex'],
+            item['batch_name'],
+            item['diploma_id'],
+            item['enroll_major_code'],
+            item['enroll_major_id'],
+            item['enroll_major_name'],
+            item['enroll_stage'],
+            item['enroll_unit_id'],
+            item['major_diploma_id'],
+            item['wenli'],
+        )
+        sql = """
+                  INSERT IGNORE INTO zyp_enroll_major_select
+                  (batch,batch_ex,batch_name,diploma_id,enroll_major_code,enroll_major_id,enroll_major_name,enroll_stage,
+                  enroll_unit_id,major_diploma_id,wenli)
+                  VALUES 
+                  (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                """
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+    def operate_em_enroll_data(self, item):
+        values = (
+            item['academic_rule'],
+            item['academic_year'],
+            item['batch_name'],
+            item['enroll_plan_count'],
+            item['tuition'],
+            item['sch_id'],
+            item['major_id'],
+            item['enroll_major_id'],
+            item['diploma_id'],
+            item['major_diploma_id'],
+            item['wenli'],
+            item['province_id'],
+        )
+        sql = """
+                  INSERT IGNORE INTO zyp_em_enroll_data
+                  (academic_rule,academic_year,batch_name,enroll_plan_count,tuition,
+                  sch_id,major_id,enroll_major_id,diploma_id,major_diploma_id,wenli,province_id)
+                  VALUES 
+                  (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                  %s,%s)
+                """
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+    def operate_em_detail(self, item):
+        values = (
+            item['batch_name'],
+            item['diploma_id'],
+            item['enroll_group_no'],
+            item['enroll_major_code'],
+            item['enroll_major_id'],
+            item['enroll_major_name'],
+            item['enroll_unit_code'],
+            item['enroll_unit_id'],
+            item['enroll_unit_name'],
+            item['major_id'],
+            item['major_logo'],
+            item['major_teach_location'],
+            item['ncee_type'],
+            item['optional_course_desc'],
+            item['optional_course_level'],
+            item['require_language'],
+            item['required_course_desc'],
+            item['required_course_level'],
+            item['required_course_num'],
+            item['sch_id'],
+            item['wenli'],
+        )
+        sql = """
+                  INSERT IGNORE INTO zyp_em_detail
+                  (batch_name,diploma_id,enroll_group_no,enroll_major_code,
+                  enroll_major_id,enroll_major_name,enroll_unit_code,enroll_unit_id,
+                  enroll_unit_name,major_id,major_logo,
+                  major_teach_location,ncee_type,optional_course_desc,
+                  optional_course_level,require_language,required_course_desc,
+                  required_course_level,required_course_num,sch_id,wenli)
+                  VALUES 
+                  (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                   %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                   %s)
+                """
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+    def operate_em_adm_data(self, item):
+        values = (
+            item['academic_year'],
+            item['admission_count'],
+            item['avg_score'],
+            item['avg_score_rank'],
+            item['batch'],
+            item['batch_ex'],
+            item['batch_name'],
+            item['enroll_group_no'],
+            item['max_score'],
+            item['max_score_rank'],
+            item['min_score'],
+            item['min_score_diff'],
+            item['min_score_rank'],
+            item['major_id'],
+            item['enroll_major_id'],
+            item['diploma_id'],
+            item['major_diploma_id'],
+            item['province_id'],
+            item['sch_id'],
+            item['wenli'],
+        )
+        sql = """
+                  INSERT IGNORE INTO zyp_em_adm_data
+                  (academic_year,admission_count,avg_score,avg_score_rank,
+                  batch,batch_ex,batch_name,enroll_group_no,max_score,
+                  max_score_rank,min_score,min_score_diff,min_score_rank,major_id,
+                  enroll_major_id,diploma_id,major_diploma_id,province_id,sch_id,
+                  wenli)
+                  VALUES 
+                  (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                   %s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                 """
         self.cursor.execute(sql, values)
         self.conn.commit()

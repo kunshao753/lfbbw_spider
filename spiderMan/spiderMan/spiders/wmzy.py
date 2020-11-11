@@ -5,7 +5,7 @@ from scrapy.spiders import CrawlSpider, Rule
 
 class WmzySpider(CrawlSpider):
     name = 'wmzy'
-    allowed_domains = ['https://www.wmzy.com']
+    allowed_domains = ['wmzy.com']
     start_urls = ['http://https://www.wmzy.com/']
 
     rules = (

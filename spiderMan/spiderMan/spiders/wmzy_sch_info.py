@@ -9,6 +9,7 @@ from spiderMan.items import LibEvaluationItem
 import sys
 import json
 import re
+import time
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -91,7 +92,7 @@ class WmzySchInfoSpider(scrapy.Spider):
             item['create_year'] = sch_create_time
             item['province'] = province
             item['t'] = 'sch_info'
-            yield item
+            # yield item
 
             # 构造详情页的请求
             detail_url = "https://www.wmzy.com/web/school?sch_id=" + sch_id
@@ -145,38 +146,48 @@ class WmzySchInfoSpider(scrapy.Spider):
             yield detail_info_item
 
             # 知名校友
-            sch_celebrity_info = data['props']['pageProps']['schoolInfor']['sch_celebrity_info']
-            if len(sch_celebrity_info) > 0:
-                for celebrity_info in sch_celebrity_info:
-                    celebrity_info_item['sch_id'] = sch_id
-                    celebrity_info_item['celebrity_name'] = celebrity_info['celebrity_name']
-                    celebrity_info_item['celebrity_desc'] = celebrity_info['celebrity_desc']
-                    celebrity_info_item['t'] = 'sch_celebrity_info'
-                    yield celebrity_info_item
+            try:
+                sch_celebrity_info = data['props']['pageProps']['schoolInfor']['sch_celebrity_info']
+                if len(sch_celebrity_info) > 0:
+                    for celebrity_info in sch_celebrity_info:
+                        celebrity_info_item['sch_id'] = sch_id
+                        celebrity_info_item['celebrity_name'] = celebrity_info['celebrity_name']
+                        celebrity_info_item['celebrity_desc'] = celebrity_info['celebrity_desc']
+                        celebrity_info_item['t'] = 'sch_celebrity_info'
+                        yield celebrity_info_item
+            except (IndexError, BaseException):
+                print('不存在知名校友')
 
             # 重点学科
-            discipline_evaluation_list = data['props']['pageProps']['schoolInfor']['sch_discipline_evaluation_list']['sch_discipline_evaluation_list']
-            if len(discipline_evaluation_list) > 0:
-                for discipline_evaluation in discipline_evaluation_list:
-                    discipline_evaluation_item['sch_id'] = sch_id
-                    discipline_evaluation_item['obj_id'] = discipline_evaluation['obj_id']
-                    discipline_evaluation_item['obj_name'] = discipline_evaluation['obj_name']
-                    discipline_evaluation_item['obj_num'] = discipline_evaluation['obj_num']
-                    discipline_evaluation_item['obj_list'] = discipline_evaluation['obj_list']
-                    discipline_evaluation_item['t'] = 'discipline_evaluation'
-                    yield discipline_evaluation_item
+            try:
+                discipline_evaluation_list = data['props']['pageProps']['schoolInfor']['sch_discipline_evaluation_list']['sch_discipline_evaluation_list']
+                if len(discipline_evaluation_list) > 0:
+                    for discipline_evaluation in discipline_evaluation_list:
+                        discipline_evaluation_item['sch_id'] = sch_id
+                        discipline_evaluation_item['obj_id'] = discipline_evaluation['obj_id']
+                        discipline_evaluation_item['obj_name'] = discipline_evaluation['obj_name']
+                        discipline_evaluation_item['obj_num'] = discipline_evaluation['obj_num']
+                        discipline_evaluation_item['obj_list'] = discipline_evaluation['obj_list']
+                        discipline_evaluation_item['t'] = 'discipline_evaluation'
+                        yield discipline_evaluation_item
+            except (IndexError, BaseException):
+                print('不存在重点学科')
 
             # 特色培养
-            sch_lib_evaluation_list = data['props']['pageProps']['schoolInfor']['sch_lib_evaluation_list']['sch_lib_evaluation_list']
-            if len(sch_lib_evaluation_list) > 0:
-                for lib_evaluation in sch_lib_evaluation_list:
-                    lib_evaluation_item['sch_id'] = sch_id
-                    lib_evaluation_item['obj_id'] = lib_evaluation['obj_id']
-                    lib_evaluation_item['obj_name'] = lib_evaluation['obj_name']
-                    lib_evaluation_item['obj_num'] = lib_evaluation['obj_num']
-                    lib_evaluation_item['obj_list'] = lib_evaluation['obj_list']
-                    lib_evaluation_item['t'] = 'lib_evaluation'
-                    yield lib_evaluation_item
+            try:
+                sch_lib_evaluation_list = data['props']['pageProps']['schoolInfor']['sch_lib_evaluation_list']['sch_lib_evaluation_list']
+                if len(sch_lib_evaluation_list) > 0:
+                    for lib_evaluation in sch_lib_evaluation_list:
+                        lib_evaluation_item['sch_id'] = sch_id
+                        lib_evaluation_item['obj_id'] = lib_evaluation['obj_id']
+                        lib_evaluation_item['obj_name'] = lib_evaluation['obj_name']
+                        lib_evaluation_item['obj_num'] = lib_evaluation['obj_num']
+                        lib_evaluation_item['obj_list'] = lib_evaluation['obj_list']
+                        lib_evaluation_item['t'] = 'lib_evaluation'
+                        time.sleep(0.001)
+                        yield lib_evaluation_item
+            except (IndexError, BaseException):
+                print('不存在特色培养')
 
 
 
