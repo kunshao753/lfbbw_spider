@@ -240,3 +240,17 @@ class EnrollRuleInfoItem(scrapy.Item):
     content = Field()
     t = Field()
 
+
+# sch info ext
+class SchInfoExtItem(scrapy.Item):
+    province_id = Field()
+    latest_admission_year = Field()
+    latest_enroll_year = Field()
+    city_id = Field()
+    city_id_desc = Field()
+    region_id = Field()
+    regioin_id_desc = Field()
+    sch_code = Field()
+    nation_id = Field()
+    sch_id = Field()
+    t = Field()

@@ -8,6 +8,8 @@
 # useful for handling different item types with a single interface
 import mysql.connector
 # from sshtunnel import SSHTunnelForwarder
+# import pymysql
+
 
 
 class SpidermanPipeline:
@@ -22,6 +24,15 @@ class SpidermanPipeline:
     }
 
     def __init__(self):
+        # with SSHTunnelForwarder(
+        #         ("47.94.240.242", "22"),
+        #         ssh_username="root",
+        #         ssh_password="258369@!pkPK",
+        #         remote_bind_address=('127.0.0.1', "3306")) as tunnel:
+        #     self.conn = pymysql.connect(host='localhost', user="root",
+        #                            passwd="lfbbw", db="zhiyuanping",
+        #                            port=tunnel.local_bind_port)
+
         # server = SSHTunnelForwarder(
         #     ssh_address_or_host=('47.94.240.242', 22),  # 指定ssh登录的跳转机的address
         #     ssh_username='root',  # 跳转机的用户
@@ -63,6 +74,8 @@ class SpidermanPipeline:
             self.operate_enroll_unit_list(item)
         elif item['t'] == 'sch_enroll_rule_info':
             self.operate_sch_enroll_rule_info(item)
+        elif item['t'] == 'sch_info_ext':
+            self.operate_sch_info_ext(item)
         return item
 
     def operate_sch_info(self, item):
@@ -428,6 +441,26 @@ class SpidermanPipeline:
         self.cursor.execute(sql, values)
         self.conn.commit()
 
+    # sch_info_ext
+    def operate_sch_info_ext(self, item):
+        values = (
+            item['province_id'],
+            item['latest_admission_year'],
+            item['latest_enroll_year'],
+            item['city_id'],
+            item['city_id_desc'],
+            item['region_id '],
+            item['regioin_id_desc'],
+            item['sch_code'],
+            item['nation_id'],
+            item['sch_id']
+        )
+        sql = """
+                UPDATE zyp_sch_info set province_id = %s,latest_admission_year = %s,latest_enroll_year = %s,city_id = %s,
+                city_id_desc = %s,region_id  = %s,regioin_id_desc = %s,sch_code = %s,nation_id = %s where sch_id=%s
+            """
+        self.cursor.execute(sql, values)
+        self.conn.commit()
     # def close_spider(self):
     #     self.cursor.close()
     #     self.conn.close()
