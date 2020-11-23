@@ -76,6 +76,12 @@ class SpidermanPipeline:
             self.operate_sch_enroll_rule_info(item)
         elif item['t'] == 'sch_info_ext':
             self.operate_sch_info_ext(item)
+        elif item['t'] == 'sch_enroll_data':
+            self.operate_sch_enroll_data(item)
+        elif item['t'] == 'major_enroll_data':
+            self.operate_major_enroll_data(item)
+        elif item['t'] == 'major_enroll_ext_data':
+            self.operate_major_enroll_ext_data(item)
         return item
 
     def operate_sch_info(self, item):
@@ -449,7 +455,7 @@ class SpidermanPipeline:
             item['latest_enroll_year'],
             item['city_id'],
             item['city_id_desc'],
-            item['region_id '],
+            item['region_id'],
             item['regioin_id_desc'],
             item['sch_code'],
             item['nation_id'],
@@ -461,6 +467,156 @@ class SpidermanPipeline:
             """
         self.cursor.execute(sql, values)
         self.conn.commit()
+
+    def operate_sch_enroll_data(self, item):
+        values = (
+            item['sch_id'],
+            item['enroll_unit_id'],
+            item['stu_province_id'],
+            item['wenli'],
+            item['diploma_id'],
+            item['academic_year'],
+            item['admission_count'],
+            item['admission_ratio'],
+            item['avg_score'],
+            item['avg_score_diff'],
+            item['avg_score_equal'],
+            item['avg_score_rank'],
+            item['bao_lower_boundary_rank'],
+            item['batch'],
+            item['batch_ex'],
+            item['batch_name'],
+            item['chong_lower_boundary_rank'],
+            item['course_level_order'],
+            item['cwbn_type'],
+            item['fluctuation'],
+            item['match_select_course_all'],
+            item['max_score'],
+            item['max_score_diff'],
+            item['max_score_equal'],
+            item['max_score_rank'],
+            item['min_score'],
+            item['min_score_diff'],
+            item['min_score_equal'],
+            item['min_score_rank'],
+            item['optional_course_desc'],
+            item['predict_rank'],
+            item['required_course_desc'],
+            item['sch_teach_location'],
+            item['special_policy'],
+            item['special_policy_tags'],
+            item['special_policy_tags_desc'],
+            item['wen_lower_boundary_rank'],
+        )
+        sql = """
+                INSERT IGNORE INTO zyp_sch_enroll_data
+                 (sch_id,enroll_unit_id,stu_province_id,wenli,diploma_id,academic_year,
+                 admission_count,admission_ratio,avg_score,avg_score_diff,avg_score_equal,
+                 avg_score_rank,bao_lower_boundary_rank,batch,batch_ex,batch_name,
+                 chong_lower_boundary_rank,course_level_order,cwbn_type,
+                 fluctuation,match_select_course_all,max_score,max_score_diff,
+                 max_score_equal,max_score_rank,min_score,min_score_diff,min_score_equal,
+                 min_score_rank,optional_course_desc,predict_rank,required_course_desc,
+                 sch_teach_location,special_policy,special_policy_tags,
+                 special_policy_tags_desc,wen_lower_boundary_rank)
+                 VALUES 
+                 (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                 %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                 %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                 %s,%s,%s,%s,%s,%s,%s)
+              """
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+    def operate_major_enroll_data(self, item):
+        values = (
+            item['stu_province_id'],
+            item['wenli'],
+            item['enroll_year'],
+            item['enroll_unit_id'],
+            item['batch'],
+            item['diploma_id'],
+            item['year'],
+            item['major_id'],
+            item['enroll_major_code'],
+            item['enroll_major_id'],
+            item['academic_year'],
+            item['admission_year'],
+            item['batch_ex'],
+            item['enroll_category'],
+            item['enroll_mode'],
+            item['enroll_stage'],
+            item['academic_rule'],
+            item['admission_count'],
+            item['avg_score'],
+            item['avg_score_diff'],
+            item['avg_score_rank'],
+            item['enroll_major_name'],
+            item['enroll_plan_count'],
+            item['max_score'],
+            item['max_score_diff'],
+            item['max_score_rank'],
+            item['min_score'],
+            item['min_score_diff'],
+            item['min_score_rank'],
+            item['tuition']
+        )
+        sql = """
+                INSERT IGNORE INTO zyp_major_enroll_data
+                 (stu_province_id,wenli,enroll_year,enroll_unit_id,batch,diploma_id,year,major_id,
+                 enroll_major_code,enroll_major_id,academic_year,admission_year,batch_ex,
+                 enroll_category,enroll_mode,enroll_stage,academic_rule,admission_count,avg_score,
+                 avg_score_diff,avg_score_rank,enroll_major_name,enroll_plan_count,max_score,
+                 max_score_diff,max_score_rank,min_score,min_score_diff,min_score_rank,tuition)
+                 VALUES 
+                 (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                 %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                 %s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+              """
+
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+    def operate_major_enroll_ext_data(self, item):
+        values = (
+            item['stu_province_id'],
+            item['sch_id'],
+            item['enroll_unit_id'],
+            item['diploma_id'],
+            item['batch'],
+            item['wenli'],
+            item['enroll_year'],
+            item['enroll_plan_count'],
+            item['enroll_unit_code'],
+            item['batch_ex'],
+            item['enroll_category'],
+            item['enroll_mode'],
+            item['enroll_stage'],
+            item['enroll_declare'],
+            item['optional_course_desc'],
+            item['optional_course_level'],
+            item['required_course_desc'],
+            item['required_course_level'],
+        )
+        sql = """
+                        INSERT IGNORE INTO zyp_major_enroll_ext_data
+                         (stu_province_id,sch_id,enroll_unit_id,diploma_id,batch,
+                         wenli,enroll_year,enroll_plan_count,enroll_unit_code,batch_ex,
+                         enroll_category,enroll_mode,enroll_stage,enroll_declare,optional_course_desc,
+                         optional_course_level,required_course_desc,required_course_level)
+                         VALUES 
+                         (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                         %s,%s,%s,%s,%s,%s,%s,%s
+                         )
+                      """
+
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+
+
+
+
     # def close_spider(self):
     #     self.cursor.close()
     #     self.conn.close()
