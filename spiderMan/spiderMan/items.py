@@ -354,3 +354,25 @@ class MajorEnrollExtDataItem(scrapy.Item):
     required_course_desc = Field()
     required_course_level = Field()
     t = Field()
+
+
+# 省份配置信息
+class ProvinceRegisterConfigItem(scrapy.Item):
+    province_id = Field()
+    enroll_category = Field()
+    bk_max_score = Field()
+    bk_rank_type = Field()
+    course_info = Field()
+    course_level_info = Field()
+    diploma_type = Field()
+    max_score = Field()
+    need_course = Field()
+    need_course_level = Field()
+    need_diploma = Field()
+    need_wenli = Field()
+    province_score_has_publish = Field()
+    rank_type = Field()
+    ysw_max_score = Field()
+    zk_max_score = Field()
+    zk_rank_type = Field()
+    t = Field()

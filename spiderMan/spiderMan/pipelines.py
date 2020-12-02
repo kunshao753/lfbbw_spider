@@ -82,6 +82,8 @@ class SpidermanPipeline:
             self.operate_major_enroll_data(item)
         elif item['t'] == 'major_enroll_ext_data':
             self.operate_major_enroll_ext_data(item)
+        elif item['t'] == 'province_register_config':
+            self.operate_province_register_config(item)
         return item
 
     def operate_sch_info(self, item):
@@ -613,7 +615,39 @@ class SpidermanPipeline:
         self.cursor.execute(sql, values)
         self.conn.commit()
 
+    def operate_province_register_config(self, item):
+        values = (
+            item['province_id'],
+            item['enroll_category'],
+            item['bk_max_score'],
+            item['bk_rank_type'],
+            item['course_info'],
+            item['course_level_info'],
+            item['diploma_type'],
+            item['max_score'],
+            item['need_course'],
+            item['need_course_level'],
+            item['need_diploma'],
+            item['need_wenli'],
+            item['province_score_has_publish'],
+            item['rank_type'],
+            item['ysw_max_score'],
+            item['zk_max_score'],
+            item['zk_rank_type'],
+        )
+        sql = """
+                                INSERT IGNORE INTO zyp_province_register_config
+                                 (province_id,enroll_category,bk_max_score,bk_rank_type,course_info,course_level_info,
+                                 diploma_type,max_score,need_course,need_course_level,need_diploma,need_wenli,
+                                 province_score_has_publish,rank_type,ysw_max_score,zk_max_score,zk_rank_type)
+                                 VALUES 
+                                 (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                                 %s,%s,%s,%s,%s,%s,%s
+                                 )
+                              """
 
+        self.cursor.execute(sql, values)
+        self.conn.commit()
 
 
 
