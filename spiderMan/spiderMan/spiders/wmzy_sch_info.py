@@ -21,6 +21,11 @@ sys.setdefaultencoding('utf-8')
 
 
 class WmzySchInfoSpider(scrapy.Spider):
+    # Authorization = '4503446 Un8iZ/jMlpc518NfFEYMFACF4wpVApK90354kK46TSv77eh4MTr8YUJQlfe2vjGO'
+    Authorization = '4504179 OTvPY7mdJzcPhAwfYK4l6bAls1bXg4BJXd7xQAZA90M328q8AHAd0DjXCL0ZPdpa'
+    # Province_id = '130000000000'
+    Province_id = '110000000000'
+
     name = 'wmzy_sch_info'
     allowed_domains = ['wmzy.com']
     start_url = 'https://www.wmzy.com/gw/api/sku/sku_service/sch_complete'
@@ -34,12 +39,12 @@ class WmzySchInfoSpider(scrapy.Spider):
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36',
         'Channel': 'www.wmzy.com pc',
         'Content-Type': 'application/json; charset=utf-8',
+        'Authorization': Authorization
     }
 
     # 默认情况下，scrapy都是采用GET请求。重写的目的：初始URL的请求修改用POST请求。
     # 需要重写start_requests()方法。
     def start_requests(self):
-
         # 142页
         for page_num in range(1, 143):
             form_data = {
@@ -96,27 +101,55 @@ class WmzySchInfoSpider(scrapy.Spider):
             # =========构造录取招生页的请求 start=================
             # enroll_unit
             post_enroll_unit_list_data = {
-                "province_id": "130000000000",
+                "province_id": self.Province_id,
                 "enroll_category": 1,
                 "enroll_mode": 1,
                 "sch_id": sch_id
             }
             enroll_unit_list_meta = {
-                "stu_province_id": "130000000000",
+                "stu_province_id": self.Province_id,
                 "sch_id": sch_id,
             }
-            yield scrapy.Request(self.get_enroll_unit_list_url, meta=enroll_unit_list_meta,
-                                 callback=self.parse_enroll_unit_list_data, method='POST', headers=self.headers,
-                                 body=json.dumps(post_enroll_unit_list_data))
+            # yield scrapy.Request(self.get_enroll_unit_list_url, meta=enroll_unit_list_meta,
+            #                      callback=self.parse_enroll_unit_list_data, method='POST', headers=self.headers,
+            #                      body=json.dumps(post_enroll_unit_list_data))
 
             # enroll_rule
-            post_sch_enroll_rule_info_data = {
-                "sch_id": sch_id
-            }
+            # post_sch_enroll_rule_info_data = {
+            #     "sch_id": sch_id
+            # }
             # yield scrapy.Request(self.get_sch_enroll_rule_info_url, callback=self.parse_sch_enroll_rule_info_data,
             #                      method='POST', headers=self.headers, body=json.dumps(post_sch_enroll_rule_info_data))
             # =========构造录取招生页的请求 end  =================
 
+            # =========新高考 - 构造录取招生页的请求 start=================
+            # 下拉筛选框sku_enroll_adm_data_drop_box_type2（学校录取数据）
+            sku_enroll_adm_data_drop_box_type2_url = "https://www.wmzy.com/gw/enroll_admission_service/sku_enroll_adm_data_drop_box_type2"
+            post_sku_enroll_adm_data_drop_box_type2 = {
+                "sch_id": sch_id,
+                "stu_province_id": self.Province_id,
+                "enroll_unit_id": sch_id,
+                "enroll_adm_type": 2
+            }
+            sku_enroll_adm_data_drop_box_type2_meta = {
+                "sch_id": sch_id,
+                "stu_province_id": self.Province_id,
+                "enroll_unit_id": sch_id,
+                "enroll_adm_type": 2
+            }
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36',
+                'Channel': 'www.wmzy.com pc',
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': self.Authorization
+            }
+
+            yield scrapy.Request(sku_enroll_adm_data_drop_box_type2_url, meta=sku_enroll_adm_data_drop_box_type2_meta,
+                                 callback=self.parse_sku_enroll_adm_data_drop_box_type2_data, method='POST',
+                                 headers=headers,
+                                 body=json.dumps(post_sku_enroll_adm_data_drop_box_type2))
+
+            # =========新高考 - 构造录取招生页的请求 end=================
     # 解析详情页数据
     def parse_detail_page(self, response):
         """
@@ -246,9 +279,9 @@ class WmzySchInfoSpider(scrapy.Spider):
                         "only_admission": True
                     }
 
-                    yield scrapy.Request(self.sch_enroll_data_url, meta=_meta,
-                                         callback=self.parse_sch_enroll_data, method='POST', headers=self.headers,
-                                         body=json.dumps(post_sch_enroll_data))
+                    # yield scrapy.Request(self.sch_enroll_data_url, meta=_meta,
+                    #                      callback=self.parse_sch_enroll_data, method='POST', headers=self.headers,
+                    #                      body=json.dumps(post_sch_enroll_data))
 
                     # major_enroll_data
                     # 招生计划 专业录取数据
@@ -281,13 +314,12 @@ class WmzySchInfoSpider(scrapy.Spider):
                                     "year": year,
                                 }
 
-
                                 # 招生计划扩展数据
                                 headers = {
                                     'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36',
                                     'Channel': 'www.wmzy.com pc',
                                     'Content-Type': 'application/json; charset=utf-8',
-                                    'Authorization': "4503446 Un8iZ/jMlpc518NfFEYMFACF4wpVApK90354kK46TSv77eh4MTr8YUJQlfe2vjGO"
+                                    'Authorization': self.Authorization
                                 }
                                 post_major_enroll_ext_data = {
                                     "page": 1,
@@ -322,13 +354,14 @@ class WmzySchInfoSpider(scrapy.Spider):
                                 }
 
                                 # 招生计划&专业录取数据
-                                yield scrapy.Request(major_enroll_data_url, meta=post_major_enroll_data,
-                                                     callback=self.parse_major_enroll_data, method='POST',
-                                                     headers=self.headers, body=json.dumps(post_major_enroll_data))
+                                # yield scrapy.Request(major_enroll_data_url, meta=post_major_enroll_data,
+                                #                      callback=self.parse_major_enroll_data, method='POST',
+                                #                      headers=self.headers, body=json.dumps(post_major_enroll_data))
                                 # 招生计划扩展信息
-                                yield scrapy.Request(new_ncee_eu_enroll_data_url, meta=meta_major_enroll_ext_data,
-                                                     callback=self.parse_major_enroll_ext_data, method='POST',
-                                                     headers=headers, body=json.dumps(post_major_enroll_ext_data))
+                                # yield scrapy.Request(new_ncee_eu_enroll_data_url, meta=meta_major_enroll_ext_data,
+                                #                      callback=self.parse_major_enroll_ext_data, method='POST',
+                                #                      headers=headers, body=json.dumps(post_major_enroll_ext_data))
+
     # enroll_rule_info
     def parse_sch_enroll_rule_info_data(self, response):
         enroll_rule_info_item = EnrollRuleInfoItem()
@@ -462,9 +495,9 @@ class WmzySchInfoSpider(scrapy.Spider):
         _meta = response.meta
         major_enroll_ext_data_item = MajorEnrollExtDataItem()
         json_content = json.loads(response.body)
-        print("================")
-        print(json_content)
-        print("================")
+        # print("================")
+        # print(json_content)
+        # print("================")
         if json_content['code'] == 0:
             major_enroll_ext_data = json_content['data']
             if "enroll_plan_count" in major_enroll_ext_data and major_enroll_ext_data['enroll_plan_count'] != 0:
@@ -488,6 +521,150 @@ class WmzySchInfoSpider(scrapy.Spider):
                 major_enroll_ext_data_item['required_course_level'] = major_enroll_ext_data['required_course_level']
                 major_enroll_ext_data_item['t'] = 'major_enroll_ext_data'
                 yield major_enroll_ext_data_item
+
+
+    # 新高考录取数据
+    def parse_sku_enroll_adm_data_drop_box_type2_data(self, response):
+        _meta = response.meta
+        json_content = json.loads(response.body)
+        # print("================")
+        # print(json_content)
+        # print("================")
+        if json_content['code'] == 0 and json_content['data']['drop_box'] is not None:
+            drop_box_data = json_content['data']['drop_box']
+            for data in drop_box_data:
+                if len(drop_box_data) > 0:
+                    # 学校录取数据 + 专业录取数据 + 招生计划
+                    # post_data = {
+                    #     "eu_id": _meta['enroll_unit_id'],
+                    #     "page_info": {
+                    #         "page": 1,
+                    #         "page_size": 100
+                    #     },
+                    #     "enroll_admission_dimension": {
+                    #         "academic_year": data['academic_year'],
+                    #         "enroll_category": 1,
+                    #         "enroll_mode": 1,
+                    #         "wenli": data['wenli'],
+                    #         "page": 1,
+                    #         "enroll_year": data['academic_year'],
+                    #         "admission_year": data['academic_year'],
+                    #         "year": data['academic_year'],
+                    #         "diploma_id": data['diploma_id'],
+                    #         "batch": data['batch'],
+                    #         "batch_ex": data['batch_ex'],
+                    #         "enroll_stage": data['enroll_stage'],
+                    #         "score_line": data['score_line'],
+                    #         "batch_name": data['batch_name'],
+                    #         "enroll_unit_id": data['enroll_unit_id'],
+                    #         "enroll_unit_name": data['enroll_unit_name'],
+                    #         "enroll_group_no": data['enroll_group_no'],
+                    #         "required_course_in_db": data['enroll_group_no'],
+                    #         "required_course": data['required_course'],
+                    #         "required_course_num": data['required_course_num'],
+                    #         "required_course_desc": data['required_course_desc']
+                    #     },
+                    #     "user_score_filter": {
+                    #         "stu_province_id": _meta['stu_province_id']
+                    #     },
+                    #     "convert_score_type": 3,
+                    #     "base": [
+                    #         "eu_enroll_ncee_type2",
+                    #         "em_enroll_ncee_type2",
+                    #         "eu_adm_ncee_type2"
+                    #     ],
+                    #     "sort_info": {
+                    #         "sort_type": 4,
+                    #         "sort_mode": 1
+                    #     }
+                    # }
+
+                    post_data = {
+                        "eu_id":"dca43a2b71303baf800c3f92",
+                        "page_info":{
+                            "page":1,
+                            "page_size":10
+                        },
+                        "enroll_admission_dimension":{
+                            "academic_year":2020,
+                            "enroll_category":1,
+                            "enroll_mode":1,
+                            "wenli":3,
+                            "page":1,
+                            "enroll_year":2020,
+                            "admission_year":2020,
+                            "year":2020,
+                            "diploma_id":7,
+                            "batch":1,
+                            "batch_ex":0,
+                            "enroll_stage":0,
+                            "score_line":436,
+                            "batch_name":"本科批",
+                            "enroll_unit_id":"dca43a2b71303baf800c3f92",
+                            "enroll_unit_name":"北京大学",
+                            "enroll_group_no":"1021[01]",
+                            "required_course_in_db":0,
+                            "required_course":None,
+                            "required_course_num":0,
+                            "required_course_desc":[
+                                "不限"
+                            ]
+                        },
+                        "user_score_filter":{
+                            "stu_province_id":"110000000000"
+                        },
+                        "convert_score_type":3,
+                        "base":[
+                            "eu_enroll_ncee_type2",
+                            "em_enroll_ncee_type2",
+                            "eu_adm_ncee_type2"
+                        ],
+                        "sort_info":{
+                            "sort_type":4,
+                            "sort_mode":1
+                        }
+                    }
+
+                    meta = {
+
+                    }
+                    headers = {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36',
+                        'Channel': 'www.wmzy.com pc',
+                        'Content-Type': 'application/json; charset=utf-8',
+                        'Authorization': self.Authorization
+                    }
+                    url = "https://www.wmzy.com/gw/enrollment_service/enroll_adm_data"
+                    yield scrapy.Request(url,
+                                         meta=meta,
+                                         callback=self.parse_enroll_adm_data, method='POST',
+                                         headers=headers,
+                                         body=json.dumps(post_data))
+
+    def parse_enroll_adm_data(self, response):
+        _meta = response.meta
+        json_content = json.loads(response.body)
+        if json_content['code'] == 0:
+            enroll_adm_data = json_content['data']
+            # eu_adm_data 学校录取数据
+            # em_enroll_data 招生计划数据
+            # eu_enroll_data 招生计划扩展数据
+
+            '、'''
+            if "em_enroll_data" in enroll_adm_data and enroll_adm_data['em_enroll_data']['total'] > 0:
+                for em_enroll_data in enroll_adm_data['em_enroll_data']['data']:
+                    print("_________———————————————______")
+                    print(em_enroll_data['enroll_major_id'])
+                    print(em_enroll_data['major_id'])
+                    print(em_enroll_data['tuition'])
+                    print("_________———————————————______")
+
+
+
+
+
+
+
 
 
 

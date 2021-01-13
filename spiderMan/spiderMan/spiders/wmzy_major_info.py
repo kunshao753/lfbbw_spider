@@ -16,6 +16,10 @@ sys.setdefaultencoding('utf-8')
 
 
 class WmzyMajorInfoSpider(scrapy.Spider):
+    # Authorization = '4503446 Un8iZ/jMlpc518NfFEYMFACF4wpVApK90354kK46TSv77eh4MTr8YUJQlfe2vjGO'
+    authorization = '4504179 OTvPY7mdJzcPhAwfYK4l6W0Qzy3wZUOwajFs0KNqvbJ68TZbwT/ZLCYhgeSdswq9'
+    Province_id = '130000000000'
+
     name = 'wmzy_major_info'
     allowed_domains = ['wmzy.com']
     start_urls = ['https://www.wmzy.com/gw/api/sku/sku_service/major_info_all?diploma_id=']
@@ -31,7 +35,7 @@ class WmzyMajorInfoSpider(scrapy.Spider):
         'Channel': 'www.wmzy.com pc',
         'Content-Type': 'application/json; charset=utf-8',
         "Content-Type": "application/json",
-        "Authorization": "4503446 Un8iZ/jMlpc518NfFEYMFG2ntSpp0aAKivue9EbaDfYLUoCrtTa7TGyAFs+NHCmP",
+        'Authorization': authorization
     }
     province_ids = {
         "650000000000", "640000000000", "630000000000", "620000000000", "610000000000", "530000000000", "520000000000",
@@ -41,17 +45,6 @@ class WmzyMajorInfoSpider(scrapy.Spider):
     "120000000000", "110000000000"
     }
 
-    # province_ids = {
-    #     "650000000000", "640000000000", "630000000000", "620000000000", "610000000000", "530000000000", "520000000000",
-    # "510000000000", "500000000000", "460000000000", "450000000000", "440000000000", "430000000000", "420000000000",
-    # "410000000000", "370000000000", "360000000000", "350000000000", "340000000000", "330000000000", "320000000000",
-    # "310000000000", "230000000000", "220000000000", "210000000000", "150000000000", "140000000000",
-    # "120000000000", "110000000000"
-    # }
-
-    # province_ids = {
-    #     "110000000000"
-    # }
     def start_requests(self):
         # 7:本科  5：专科
         diplomas = ['7', '5']
